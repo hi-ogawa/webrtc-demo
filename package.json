@@ -1,0 +1,37 @@
+{
+	"name": "yt-dlp-gui",
+	"version": "0.1.2",
+	"private": true,
+	"type": "module",
+	"main": "./dist/electron/main.cjs",
+	"scripts": {
+		"dev": "vite dev",
+		"build": "vite build",
+		"lint": "biome check --write .",
+		"lint-check": "biome check ."
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^1.9.4",
+		"@hiogawa/tiny-form": "0.0.1-pre.10",
+		"@hiogawa/tiny-rpc": "0.2.3-pre.18",
+		"@hiogawa/tiny-toast": "0.1.1-pre.10",
+		"@hiogawa/utils": "^1.7.0",
+		"@tanstack/react-query": "^5.62.10",
+		"@types/node": "^22.10.2",
+		"@types/react": "^19.0.2",
+		"@types/react-dom": "^19.0.2",
+		"@vitejs/plugin-react": "^4.3.4",
+		"react": "^19.0.0",
+		"react-dom": "^19.0.0",
+		"typescript": "^5.7.2",
+		"unocss": "^0.65.3",
+		"vite": "^6.0.6"
+	},
+	"packageManager": "pnpm@9.15.1+sha512.1acb565e6193efbebda772702950469150cf12bcc764262e7587e71d19dc98a423dff9536e57ea44c49bdf790ff694e83c27be5faa23d67e0c033b583be4bfcf",
+	"volta": {
+		"node": "20.18.1"
+	},
+	"dependencies": {
+		"@hiogawa/utils-node": "^0.0.2"
+	}
+}
