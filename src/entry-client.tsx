@@ -21,7 +21,7 @@ function main() {
 // serverless webrtc chat?
 // data channel
 
-const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
+// const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 async function mainWebRtc() {
 	// https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Perfect_negotiation
@@ -39,39 +39,106 @@ async function mainWebRtc() {
 			// { urls: "stun:stun3.l.google.com:5349" },
 			// { urls: "stun:stun4.l.google.com:19302" },
 			// { urls: "stun:stun4.l.google.com:5349" }
-		]
-	})
+		],
+	});
 	Object.assign(globalThis, { pc });
-	pc.onicecandidate = e => {
-		console.log("[icecandidate]", e.candidate);
-	}
-	pc.onicecandidateerror
-	pc.onconnectionstatechange;
-	pc.ondatachannel;
-	pc.onicegatheringstatechange;
-	pc.onsignalingstatechange;
-	pc.onnegotiationneeded;
+	pc.onsignalingstatechange = (e) => {
+		console.log("[onsignalingstatechange]", e);
+		document.body.appendChild(
+			Object.assign(document.createElement("pre"), {
+				textContent: JSON.stringify(
+					[
+						"onsignalingstatechange",
+						{
+							connectionState: pc.connectionState,
+							iceConnectionState: pc.iceConnectionState,
+							signalingState: pc.signalingState,
+							localDescription: pc.localDescription,
+						},
+					],
+					null,
+					2,
+				),
+			}),
+		);
+	};
+	pc.onicegatheringstatechange = (e) =>
+		console.log("[onicegatheringstatechange]", e);
+	pc.onicecandidate = (e) => {
+		console.log("[onicecandidate]", e);
+		document.body.appendChild(
+			Object.assign(document.createElement("pre"), {
+				textContent: JSON.stringify(["onicecandidate", e.candidate], null, 2),
+			}),
+		);
+	};
+	pc.onicecandidateerror = (e) => console.log("[onicecandidateerror]", e);
+	pc.onconnectionstatechange = (e) => {
+		console.log("[onconnectionstatechange]", e);
+		document.body.appendChild(
+			Object.assign(document.createElement("pre"), {
+				textContent: JSON.stringify(
+					[
+						"onconnectionstatechange",
+						{
+							connectionState: pc.connectionState,
+							iceConnectionState: pc.iceConnectionState,
+							signalingState: pc.signalingState,
+							localDescription: pc.localDescription,
+						},
+					],
+					null,
+					2,
+				),
+			}),
+		);
+	};
+	pc.ondatachannel = (e) => console.log("[ondatachannel]", e);
+	pc.onnegotiationneeded = (e) => {
+		console.log("[onnegotiationneeded]", e);
+		pc.setLocalDescription();
+	};
 
-	await pc.setLocalDescription();
-	console.log(pc.localDescription);
+	// const channel = pc.createDataChannel("test");
+	const channel = pc.createDataChannel("test", { negotiated: true, id: 0 });
+	console.log(channel);
+	Object.assign(globalThis, { channel });
+	channel.onclose = (e) => console.log("[channel.onclose]", e)
+	channel.onerror = (e) => console.log("[channel.onerror]", e)
+	channel.onopen = (event) => {
+		console.log("[channel.onopen]", event);
+		channel.send("Hi you!\n");
+	};
+	channel.onmessage = (event) => {
+		console.log("[channel.onmessage]", event)
+	};
 
-	document.body.appendChild(Object.assign(document.createElement("pre"), {
-		textContent: JSON.stringify(pc.localDescription, null, 2)
-	}))
-	pc.setRemoteDescription;
+	// pc.setLocalDescription();
+
+	// await pc.setLocalDescription();
+	// console.log(pc.localDescription);
+
+	// document.body.appendChild(Object.assign(document.createElement("pre"), {
+	// 	textContent: JSON.stringify(pc.localDescription, null, 2)
+	// }))
+
+	// 1. copy paste from other tabs
+	// pc.setRemoteDescription(...);
+	// 2. update local description (type: offer -> answer)
+	// pc.setLocalDescription();
 	// pc.addIceCandidate;
 
 	// const offer = await pc.createOffer()
 	// console.log(offer);
 	// await pc.setLocalDescription(offer);
 
-	const channel = pc.createDataChannel("test");
-	console.log(channel);
+	// const channel = pc.createDataChannel("test");
+	// console.log(channel);
 
-	channel.onopen = (event) => {
-		console.log("[open]", event)
-		channel.send("Hi you!");
-	};
+	// channel.onopen = (event) => {
+	// 	console.log("[open]", event)
+	// 	channel.send("Hi you!");
+	// };
 	// channel.onmessage = (event) => {
 	// 	console.log("[message]", event)
 	// };
@@ -88,10 +155,10 @@ async function mainWebRtc() {
 	// }
 
 	// let init = async () => {
-  //   localStream = await navigator.mediaDevices.getUserMedia( {video: true} );
-  //   (document.getElementById('user-1') as HTMLMediaElement).srcObject = localStream;
+	//   localStream = await navigator.mediaDevices.getUserMedia( {video: true} );
+	//   (document.getElementById('user-1') as HTMLMediaElement).srcObject = localStream;
 
-  //   createOffer();
+	//   createOffer();
 	// }
 
 	// // https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Session_lifetime
@@ -137,4 +204,4 @@ async function mainWebRtc() {
 	// }
 }
 
-mainWebRtc()
+mainWebRtc();

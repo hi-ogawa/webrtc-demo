@@ -22,16 +22,16 @@ async function handler(request: Request) {
 			Object.fromEntries(url.searchParams),
 		);
 
-		getUserAgent
+		getUserAgent;
 
-		request.headers.get('sec-ch-ua-platform')
-		request.headers.get('sec-ch-ua')
+		request.headers.get("sec-ch-ua-platform");
+		request.headers.get("sec-ch-ua");
 
 		// sec-ch-ua-platform:
 		// sec-ch-ua:
 		// "Chromium";v="131", "Not_A Brand";v="24"
 
-		request.headers.get("user-agent")
+		request.headers.get("user-agent");
 
 		if (!result.success) {
 			return Response.json(result, { status: 400 });
@@ -43,12 +43,12 @@ async function handler(request: Request) {
 
 function getUserAgent(headers: Headers) {
 	const UA_RE = /"(.*?)"/;
-	const ua = headers.get('sec-ch-ua')?.match(UA_RE)?.[1];
-	const platform = headers.get('sec-ch-ua-platform')?.match(UA_RE)?.[1];
+	const ua = headers.get("sec-ch-ua")?.match(UA_RE)?.[1];
+	const platform = headers.get("sec-ch-ua-platform")?.match(UA_RE)?.[1];
 	if (ua && platform) {
 		return `${ua} (${platform})`;
 	}
-	return "Unknown"
+	return "Unknown";
 }
 
 export default webToNodeHandler(handler);
