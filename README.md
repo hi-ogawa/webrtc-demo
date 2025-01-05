@@ -1,5 +1,3 @@
-TODO
+# webrtc-demo (wip)
 
-- [ ] api server
-- [ ] client (SPA)
-- [ ] lan server on electron
+just learning something new
