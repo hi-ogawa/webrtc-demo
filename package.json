@@ -6,7 +6,7 @@
 	"main": "./dist/electron/main.cjs",
 	"scripts": {
 		"dev": "vite dev",
-		"build": "vite build",
+		"build": "vite build --app",
 		"lint": "biome check --write .",
 		"lint-check": "biome check ."
 	},
@@ -32,6 +32,7 @@
 		"node": "20.18.1"
 	},
 	"dependencies": {
-		"@hiogawa/utils-node": "^0.0.2"
+		"@hiogawa/utils-node": "^0.0.2",
+		"valibot": "1.0.0-beta.9"
 	}
 }

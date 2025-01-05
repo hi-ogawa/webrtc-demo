@@ -11,6 +11,9 @@ importers:
       '@hiogawa/utils-node':
         specifier: ^0.0.2
         version: 0.0.2
+      valibot:
+        specifier: 1.0.0-beta.9
+        version: 1.0.0-beta.9(typescript@5.7.2)
     devDependencies:
       '@biomejs/biome':
         specifier: ^1.9.4
@@ -1145,6 +1148,14 @@ packages:
     peerDependencies:
       browserslist: '>= 4.21.0'
 
+  valibot@1.0.0-beta.9:
+    resolution: {integrity: sha512-yEX8gMAZ2R1yI2uwOO4NCtVnJQx36zn3vD0omzzj9FhcoblvPukENIiRZXKZwCnqSeV80bMm8wNiGhQ0S8fiww==}
+    peerDependencies:
+      typescript: '>=5'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
   vite@6.0.7:
     resolution: {integrity: sha512-RDt8r/7qx9940f8FcOIAH9PTViRrghKaK2K1jY3RaAURrEUbm9Du1mJ72G+jlhtG3WwodnfzY8ORQZbBavZEAQ==}
     engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
@@ -2253,6 +2264,10 @@ snapshots:
       browserslist: 4.24.3
       escalade: 3.2.0
       picocolors: 1.1.1
+
+  valibot@1.0.0-beta.9(typescript@5.7.2):
+    optionalDependencies:
+      typescript: 5.7.2
 
   vite@6.0.7(@types/node@22.10.5)(jiti@2.4.2)(tsx@4.19.2):
     dependencies:
