@@ -16,7 +16,7 @@ function main() {
 	reactRoot.render(root);
 }
 
-// main();
+main();
 
 // serverless webrtc chat?
 // data channel
@@ -103,14 +103,14 @@ async function mainWebRtc() {
 	const channel = pc.createDataChannel("test", { negotiated: true, id: 0 });
 	console.log(channel);
 	Object.assign(globalThis, { channel });
-	channel.onclose = (e) => console.log("[channel.onclose]", e)
-	channel.onerror = (e) => console.log("[channel.onerror]", e)
+	channel.onclose = (e) => console.log("[channel.onclose]", e);
+	channel.onerror = (e) => console.log("[channel.onerror]", e);
 	channel.onopen = (event) => {
 		console.log("[channel.onopen]", event);
 		channel.send("Hi you!\n");
 	};
 	channel.onmessage = (event) => {
-		console.log("[channel.onmessage]", event)
+		console.log("[channel.onmessage]", event);
 	};
 
 	// pc.setLocalDescription();
@@ -204,4 +204,4 @@ async function mainWebRtc() {
 	// }
 }
 
-mainWebRtc();
+// mainWebRtc();

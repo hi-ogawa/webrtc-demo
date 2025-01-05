@@ -1,5 +1,7 @@
-TODO
+# webrtc-demo
 
-- [ ] api server
-- [ ] client (SPA)
-- [ ] lan server on electron
+```sh
+# development
+pnpm i
+pnpm dev
+```
