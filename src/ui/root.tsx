@@ -62,6 +62,7 @@ class WebrtcManager {
 				this.updateState();
 			});
 		}
+		// TODO: need to share icecandidate events too?
 		this.pc.addEventListener("icecandidate", (e) => {
 			if (e.candidate) {
 				this.pc.addIceCandidate(e.candidate);
@@ -91,6 +92,7 @@ class WebrtcManager {
 				iceGatheringState: this.pc.iceGatheringState,
 			},
 		};
+		console.log(this.state.connection);
 		this.notify();
 	}
 
@@ -157,8 +159,23 @@ function App() {
 
 	const connectMutation = useMutation({
 		mutationFn: async (remoteDescription: RTCSessionDescriptionInit) => {
+			const descriptionReady = new Promise<void>((resolve, _reject) => {
+				manager.pc.addEventListener(
+					"iceconnectionstatechange",
+					function handler() {
+						if (manager.pc.iceConnectionState === "checking") {
+							manager.pc.removeEventListener(
+								"iceconnectionstatechange",
+								handler,
+							);
+							resolve();
+						}
+					},
+				);
+			});
 			await manager.pc.setRemoteDescription(remoteDescription);
 			await manager.pc.setLocalDescription();
+			await descriptionReady;
 			const res = await fetch("/api/register", {
 				method: "POST",
 				body: JSON.stringify({
