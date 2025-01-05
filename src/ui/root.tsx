@@ -1,5 +1,6 @@
 import { createTinyForm } from "@hiogawa/tiny-form";
-import { useMutation } from "@tanstack/react-query";
+import { tinyassert } from "@hiogawa/utils";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import React from "react";
 import { QueryClientWrapper } from "./query";
 
@@ -61,9 +62,6 @@ class WebrtcManager {
 				this.updateState();
 			});
 		}
-		this.pc.addEventListener("negotiationneeded", () => {
-			this.pc.setLocalDescription();
-		});
 		this.pc.addEventListener("icecandidate", (e) => {
 			if (e.candidate) {
 				this.pc.addIceCandidate(e.candidate);
@@ -123,17 +121,71 @@ function App() {
 		manager.getSnapshot,
 	);
 
-	useMutation;
-	// const connectMutation = useMutation({
-	// 	mutationFn: async () => {
-	// 		manager.connect();
-	// 	},
-	// });
-	// connectMutation.isPending;
-	// fetch("/api/register");
+	const registerMutation = useMutation({
+		mutationFn: async () => {
+			const descriptionReady = new Promise((resolve, reject) => {
+				manager.pc.addEventListener(
+					"negotiationneeded",
+					async function handler() {
+						manager.pc.removeEventListener("negotiationneeded", handler);
+						manager.pc.setLocalDescription().then(resolve, reject);
+					},
+				);
+			});
+			const channel = manager.pc.createDataChannel("webrtc-demo");
+			channel.addEventListener("open", (e) => {
+				console.log("[channel.onopen]", e);
+				channel.send("Hello from sender");
+			});
+			channel.addEventListener("message", (e) => {
+				console.log("[channel.onmessage]", e);
+			});
+			await descriptionReady;
+			const res = await fetch("/api/register", {
+				method: "POST",
+				body: JSON.stringify({
+					name: form.data.name,
+					description: manager.pc.localDescription,
+				}),
+			});
+			tinyassert(res.ok);
+		},
+		onSettled() {
+			discoverQuery.refetch();
+		},
+	});
+
+	const connectMutation = useMutation({
+		mutationFn: async (remoteDescription: RTCSessionDescriptionInit) => {
+			await manager.pc.setRemoteDescription(remoteDescription);
+			await manager.pc.setLocalDescription();
+			const res = await fetch("/api/register", {
+				method: "POST",
+				body: JSON.stringify({
+					name: form.data.name,
+					// TODO: needs to wait for signalingstatechange etc...?
+					description: manager.pc.localDescription,
+				}),
+			});
+			tinyassert(res.ok);
+		},
+		onSettled() {
+			discoverQuery.refetch();
+		},
+	});
+
+	const discoverQuery = useQuery({
+		queryKey: ["/api/discover"],
+		queryFn: async () => {
+			const res = await fetch("/api/discover");
+			return (await res.json()) as any[];
+		},
+		refetchInterval: 5000,
+	});
 
 	const form = createTinyForm(
 		React.useState({
+			name: "",
 			remoteDescription: "",
 		}),
 	);
@@ -141,28 +193,21 @@ function App() {
 	return (
 		<div className="flex flex-col gap-2 w-full max-w-lg">
 			<div className="flex flex-col gap-2">
-				<button
-					onClick={() => {
-						const channel = manager.pc.createDataChannel("webrtc-demo");
-						channel.addEventListener("open", (e) => {
-							console.log("[channel.onopen]", e);
-							channel.send("Hello from sender");
-						});
-						channel.addEventListener("message", (e) => {
-							console.log("[channel.onmessage]", e);
-						});
-					}}
-				>
-					Register
-				</button>
+				<div>
+					<input {...form.fields.name.props()} />
+					<button
+						onClick={() => {
+							registerMutation.mutate();
+						}}
+					>
+						Register
+					</button>
+				</div>
 				<div className="flex flex-col gap-2">
 					<textarea {...form.fields.remoteDescription.props()} />
 					<button
-						onClick={async () => {
-							await manager.pc.setRemoteDescription(
-								JSON.parse(form.data.remoteDescription),
-							);
-							await manager.pc.setLocalDescription();
+						onClick={() => {
+							connectMutation.mutate(JSON.parse(form.data.remoteDescription));
 						}}
 					>
 						Connect
@@ -170,6 +215,7 @@ function App() {
 				</div>
 				<pre>{JSON.stringify(state.connection, null, 2)}</pre>
 			</div>
+			<pre>{JSON.stringify(discoverQuery.data, null, 2)}</pre>
 			{false && <MockApp />}
 		</div>
 	);
