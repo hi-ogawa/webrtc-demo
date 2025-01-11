@@ -153,7 +153,7 @@ function App() {
 			tinyassert(res.ok);
 		},
 		onSettled() {
-			discoverQuery.refetch();
+			// discoverQuery.refetch();
 		},
 	});
 
@@ -187,18 +187,18 @@ function App() {
 			tinyassert(res.ok);
 		},
 		onSettled() {
-			discoverQuery.refetch();
+			// discoverQuery.refetch();
 		},
 	});
 
-	const discoverQuery = useQuery({
-		queryKey: ["/api/discover"],
-		queryFn: async () => {
-			const res = await fetch("/api/discover");
-			return (await res.json()) as any[];
-		},
-		refetchInterval: 5000,
-	});
+	// const discoverQuery = useQuery({
+	// 	queryKey: ["/api/discover"],
+	// 	queryFn: async () => {
+	// 		const res = await fetch("/api/discover");
+	// 		return (await res.json()) as any[];
+	// 	},
+	// 	refetchInterval: 5000,
+	// });
 
 	const form = createTinyForm(
 		React.useState({
@@ -206,6 +206,50 @@ function App() {
 			remoteDescription: "",
 		}),
 	);
+
+	// debug
+	if (1) {
+		return (
+			<div className="flex flex-col gap-2 w-full max-w-lg mx-auto items-start p-2">
+				<h1 className="text-xl">WebRTC Test</h1>
+				<button
+					onClick={() => {
+						const channel = manager.pc.createDataChannel("webrtc-demo");
+						channel.addEventListener("open", (e) => {
+							console.log("[channel.onopen]", e);
+							channel.send("Hello from sender");
+						});
+						channel.addEventListener("message", (e) => {
+							console.log("[channel.onmessage]", e);
+						});
+					}}
+				>
+					createDataChannel
+				</button>
+				<button
+					onClick={() => {
+						manager.pc.setLocalDescription();
+					}}
+				>
+					setLocalDescription
+				</button>
+				<button>setRemoteDescription</button>
+				<button>addIceCanditate</button>
+				<div>
+					<h4>RTCPeerConnection</h4>
+					<pre className="break-all whitespace-pre-wrap">
+						{JSON.stringify(state.connection, null, 2)}
+					</pre>
+				</div>
+				<div>
+					<h4>RTCIceCandidate</h4>
+					<pre className="break-all whitespace-pre-wrap">
+						{JSON.stringify([], null, 2)}
+					</pre>
+				</div>
+			</div>
+		);
+	}
 
 	return (
 		<div className="flex flex-col gap-2 w-full max-w-lg">
@@ -232,7 +276,7 @@ function App() {
 				</div>
 				<pre>{JSON.stringify(state.connection, null, 2)}</pre>
 			</div>
-			<pre>{JSON.stringify(discoverQuery.data, null, 2)}</pre>
+			{/* <pre>{JSON.stringify(discoverQuery.data, null, 2)}</pre> */}
 			{false && <MockApp />}
 		</div>
 	);
