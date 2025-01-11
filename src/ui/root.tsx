@@ -238,7 +238,9 @@ function App() {
 						</button>
 						<button
 							onClick={() => {
-								const result = window.prompt("setRemoteDescription");
+								const result = window.prompt(
+									"Copy 'localDescription' from 'Answer' side",
+								);
 								if (result) {
 									manager.pc.setRemoteDescription(JSON.parse(result));
 								}
@@ -267,7 +269,9 @@ function App() {
 						</button>
 						<button
 							onClick={() => {
-								const result = window.prompt("setRemoteDescription");
+								const result = window.prompt(
+									"Copy 'localDescription' from 'Offer' side",
+								);
 								if (result) {
 									manager.pc.setRemoteDescription(JSON.parse(result));
 								}
@@ -308,6 +312,7 @@ function App() {
 						{JSON.stringify([], null, 2)}
 					</pre>
 				</div>
+				{/* TODO: channel message */}
 			</div>
 		);
 	}
