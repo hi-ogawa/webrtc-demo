@@ -65,7 +65,7 @@ class WebrtcManager {
 		// TODO: need to share icecandidate events too?
 		this.pc.addEventListener("icecandidate", (e) => {
 			if (e.candidate) {
-				this.pc.addIceCandidate(e.candidate);
+				// this.pc.addIceCandidate(e.candidate);
 			}
 		});
 		this.pc.addEventListener("datachannel", (e) => {
@@ -210,31 +210,91 @@ function App() {
 	// debug
 	if (1) {
 		return (
-			<div className="flex flex-col gap-2 w-full max-w-lg mx-auto items-start p-2">
+			<div className="flex flex-col gap-4 w-full max-w-lg mx-auto items-start p-2">
 				<h1 className="text-xl">WebRTC Test</h1>
-				<button
+				<div className="flex w-full">
+					<div className="flex-1 flex flex-col gap-2 items-center">
+						<h4>Offer</h4>
+						<button
+							onClick={() => {
+								const channel = manager.pc.createDataChannel("webrtc-demo");
+								channel.addEventListener("open", (e) => {
+									console.log("[channel.onopen]", e);
+									channel.send("Hello from sender");
+								});
+								channel.addEventListener("message", (e) => {
+									console.log("[channel.onmessage]", e);
+								});
+							}}
+						>
+							1. createDataChannel
+						</button>
+						<button
+							onClick={() => {
+								manager.pc.setLocalDescription();
+							}}
+						>
+							3. setLocalDescription
+						</button>
+						<button
+							onClick={() => {
+								const result = window.prompt("setRemoteDescription");
+								if (result) {
+									manager.pc.setRemoteDescription(JSON.parse(result));
+								}
+							}}
+						>
+							6. setRemoteDescription
+						</button>
+					</div>
+					<div className="flex-1 flex flex-col gap-2 items-center">
+						<h4>Answer</h4>
+						<button
+							onClick={() => {
+								manager.pc.addEventListener("datachannel", (e) => {
+									const channel = e.channel;
+									channel.addEventListener("open", (e) => {
+										console.log("[channel.onopen]", e);
+										channel.send("Hello from receiver");
+									});
+									channel.addEventListener("message", (e) => {
+										console.log("[channel.onmessage]", e);
+									});
+								});
+							}}
+						>
+							2. listen "datachannel"
+						</button>
+						<button
+							onClick={() => {
+								const result = window.prompt("setRemoteDescription");
+								if (result) {
+									manager.pc.setRemoteDescription(JSON.parse(result));
+								}
+							}}
+						>
+							4. setRemoteDescription
+						</button>
+						<button
+							onClick={() => {
+								manager.pc.setLocalDescription();
+							}}
+						>
+							5. setLocalDescription
+						</button>
+					</div>
+				</div>
+				{/* TODO: not needed? */}
+				{/* <button
 					onClick={() => {
-						const channel = manager.pc.createDataChannel("webrtc-demo");
-						channel.addEventListener("open", (e) => {
-							console.log("[channel.onopen]", e);
-							channel.send("Hello from sender");
-						});
-						channel.addEventListener("message", (e) => {
-							console.log("[channel.onmessage]", e);
-						});
+						const result = window.prompt("addIceCandidate");
+						if (result) {
+							manager.pc.addIceCandidate(JSON.parse(result));
+						}
 					}}
 				>
-					createDataChannel
-				</button>
-				<button
-					onClick={() => {
-						manager.pc.setLocalDescription();
-					}}
-				>
-					setLocalDescription
-				</button>
-				<button>setRemoteDescription</button>
-				<button>addIceCanditate</button>
+					addIceCandidate
+				</button> */}
 				<div>
 					<h4>RTCPeerConnection</h4>
 					<pre className="break-all whitespace-pre-wrap">
@@ -242,6 +302,7 @@ function App() {
 					</pre>
 				</div>
 				<div>
+					{/* TODO */}
 					<h4>RTCIceCandidate</h4>
 					<pre className="break-all whitespace-pre-wrap">
 						{JSON.stringify([], null, 2)}
