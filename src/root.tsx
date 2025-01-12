@@ -142,6 +142,8 @@ function App() {
 
 	const [channel, setChannel, channelState] = useDataChannel();
 
+	const videoRef = React.useRef<HTMLVideoElement>(null);
+
 	return (
 		<div className="flex flex-col gap-4 w-full max-w-lg mx-auto items-start p-2">
 			<div className="flex items-center w-full">
@@ -159,12 +161,17 @@ function App() {
 				<div className="flex-1 flex flex-col gap-2 items-center">
 					<h4>Caller</h4>
 					<button
-						onClick={() => {
-							const channel = manager.pc.createDataChannel("webrtc-demo");
-							setChannel(channel);
+						onClick={async () => {
+							const media = await navigator.mediaDevices.getUserMedia({
+								video: true,
+								audio: false,
+							});
+							for (const track of media.getTracks()) {
+								manager.pc.addTrack(track);
+							}
 						}}
 					>
-						1. createDataChannel
+						1. getUserMedia + addTrack
 					</button>
 					<button
 						onClick={() => {
@@ -190,13 +197,19 @@ function App() {
 					<h4>Callee</h4>
 					<button
 						onClick={() => {
-							manager.pc.addEventListener("datachannel", (e) => {
-								const channel = e.channel;
-								setChannel(channel);
+							// manager.pc.addEventListener("datachannel", (e) => {
+							// 	const channel = e.channel;
+							// 	setChannel(channel);
+							// });
+							manager.pc.addEventListener("track", (e) => {
+								// TODO: why `e.streams` empty?
+								console.log(e.track);
+								console.log(e.streams);
+								videoRef.current!.srcObject = e.streams[0];
 							});
 						}}
 					>
-						3. listen "datachannel"
+						3. listen "track" event
 					</button>
 					<button
 						onClick={() => {
@@ -231,7 +244,7 @@ function App() {
 			>
 				addIceCandidate
 			</button>
-			<div className="flex flex-col gap-1">
+			{/* <div className="flex flex-col gap-1">
 				<h4>DataChannel</h4>
 				<form
 					action={(formData) => {
@@ -252,6 +265,19 @@ function App() {
 				<pre className="text-xs break-all whitespace-pre-wrap">
 					{JSON.stringify(channelState.messages, null, 2)}
 				</pre>
+			</div> */}
+			<div className="flex flex-col gap-1 w-full">
+				<h4>Video</h4>
+				<div className="p-2 px-4">
+					<div className="relative w-full aspect-square overflow-hidden bg-black">
+						<video
+							className="absolute w-full h-full"
+							ref={videoRef}
+							autoPlay
+							playsInline
+						></video>
+					</div>
+				</div>
 			</div>
 			<div>
 				<div className="flex gap-2">
