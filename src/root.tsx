@@ -145,6 +145,11 @@ function App() {
 	return (
 		<div className="flex flex-col gap-4 w-full max-w-lg mx-auto items-start p-2">
 			<h1 className="text-xl">WebRTC Tester</h1>
+			<div className="text-sm text-slate-800">
+				Open two tabs, one for the "Caller" and one for the "Callee". Follow the
+				steps 1-6 below to establish a WebRTC connection and test the
+				DataChannel chat functionality.
+			</div>
 			<div className="flex w-full">
 				<div className="flex-1 flex flex-col gap-2 items-center">
 					<h4>Caller</h4>
