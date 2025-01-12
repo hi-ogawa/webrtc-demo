@@ -1,5 +1,9 @@
 import React from "react";
 
+// references
+// https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Connectivity
+// https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Perfect_negotiation
+
 export function Root() {
 	return <App />;
 }
