@@ -166,6 +166,7 @@ function App() {
 								video: true,
 								audio: false,
 							});
+							videoRef.current!.srcObject = media;
 							for (const track of media.getTracks()) {
 								manager.pc.addTrack(track);
 							}
@@ -202,10 +203,7 @@ function App() {
 							// 	setChannel(channel);
 							// });
 							manager.pc.addEventListener("track", (e) => {
-								// TODO: why `e.streams` empty?
-								console.log(e.track);
-								console.log(e.streams);
-								videoRef.current!.srcObject = e.streams[0];
+								videoRef.current!.srcObject = new MediaStream([e.track]);
 							});
 						}}
 					>
