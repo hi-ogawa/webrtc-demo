@@ -1,8 +1,7 @@
 import "virtual:uno.css";
 import React from "react";
 import ReactDOMClient from "react-dom/client";
-import { Root } from "./ui/root";
-import { toast } from "./ui/toast";
+import { Root } from "./root";
 
 function main() {
 	const domRoot = document.getElementById("root")!;
@@ -12,7 +11,6 @@ function main() {
 			<Root />
 		</React.StrictMode>
 	);
-	toast.render();
 	reactRoot.render(root);
 }
 

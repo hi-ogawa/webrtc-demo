@@ -1,12 +1,7 @@
 import React from "react";
-import { QueryClientWrapper } from "./query";
 
 export function Root() {
-	return (
-		<QueryClientWrapper>
-			<App />
-		</QueryClientWrapper>
-	);
+	return <App />;
 }
 
 class WebrtcManager {
