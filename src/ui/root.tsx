@@ -21,14 +21,17 @@ class WebrtcManager {
 			| "iceConnectionState"
 			| "iceGatheringState"
 		>;
+		candidates: (RTCIceCandidate | null)[];
 	};
-	channel?: RTCDataChannel;
+	candidates: (RTCIceCandidate | null)[] = [];
 
 	constructor() {
 		this.pc = new RTCPeerConnection({
 			iceServers: [
 				// https://www.metered.ca/blog/list-of-webrtc-ice-servers/
-				{ urls: "stun:stun.l.google.com:19302" },
+				{
+					urls: ["stun:stun.l.google.com:19302", "stun:stun.l.google.com:5349"],
+				},
 			],
 		});
 
@@ -59,21 +62,10 @@ class WebrtcManager {
 				this.updateState();
 			});
 		}
-		// TODO: need to share icecandidate events too?
+
 		this.pc.addEventListener("icecandidate", (e) => {
-			if (e.candidate) {
-				// this.pc.addIceCandidate(e.candidate);
-			}
-		});
-		this.pc.addEventListener("datachannel", (e) => {
-			const channel = e.channel;
-			channel.addEventListener("open", (e) => {
-				console.log("[channel.onopen]", e);
-				channel.send("Hello from receiver");
-			});
-			channel.addEventListener("message", (e) => {
-				console.log("[channel.onmessage]", e);
-			});
+			this.candidates.push(e.candidate);
+			this.updateState();
 		});
 		this.updateState();
 	}
@@ -88,37 +80,63 @@ class WebrtcManager {
 				iceConnectionState: this.pc.iceConnectionState,
 				iceGatheringState: this.pc.iceGatheringState,
 			},
+			candidates: this.candidates,
 		};
-		console.log(this.state.connection);
 		this.notify();
 	}
 
 	// API for useSyncExternalStore
 	listeners = new Set<() => void>();
-
 	subscribe = (listener: () => void) => {
 		this.listeners.add(listener);
 		return () => {
 			this.listeners.delete(listener);
 		};
 	};
-
 	notify() {
 		for (const listener of this.listeners) {
 			listener();
 		}
 	}
-
 	getSnapshot = () => this.state;
 }
 
 const manager = new WebrtcManager();
+
+function useDataChannel() {
+	const [channel, setChannel] = React.useState<RTCDataChannel>();
+	const [state, setState] = React.useState<RTCDataChannelState>();
+	const [messages, setMessages] = React.useState<unknown[]>([]);
+
+	React.useEffect(() => {
+		if (!channel) return;
+		for (const eventName of [
+			"open",
+			"close",
+			"closing",
+			"error",
+		] satisfies (keyof RTCDataChannelEventMap)[]) {
+			channel.addEventListener(eventName, () => {
+				setState(channel.readyState);
+			});
+		}
+
+		channel.addEventListener("message", (e) => {
+			setMessages((v) => [...v, e.data]);
+			setState(channel.readyState);
+		});
+	}, [channel]);
+
+	return [channel, setChannel, messages, state] as const;
+}
 
 function App() {
 	const state = React.useSyncExternalStore(
 		manager.subscribe,
 		manager.getSnapshot,
 	);
+
+	const [channel, setChannel, channelMessages] = useDataChannel();
 
 	return (
 		<div className="flex flex-col gap-4 w-full max-w-lg mx-auto items-start p-2">
@@ -129,13 +147,7 @@ function App() {
 					<button
 						onClick={() => {
 							const channel = manager.pc.createDataChannel("webrtc-demo");
-							channel.addEventListener("open", (e) => {
-								console.log("[channel.onopen]", e);
-								channel.send("Hello from sender");
-							});
-							channel.addEventListener("message", (e) => {
-								console.log("[channel.onmessage]", e);
-							});
+							setChannel(channel);
 						}}
 					>
 						1. createDataChannel
@@ -150,7 +162,7 @@ function App() {
 					<button
 						onClick={() => {
 							const result = window.prompt(
-								"Copy 'localDescription' from 'Answer' side",
+								"Copy 'localDescription' from 'Callee' side",
 							);
 							if (result) {
 								manager.pc.setRemoteDescription(JSON.parse(result));
@@ -166,13 +178,7 @@ function App() {
 						onClick={() => {
 							manager.pc.addEventListener("datachannel", (e) => {
 								const channel = e.channel;
-								channel.addEventListener("open", (e) => {
-									console.log("[channel.onopen]", e);
-									channel.send("Hello from receiver");
-								});
-								channel.addEventListener("message", (e) => {
-									console.log("[channel.onmessage]", e);
-								});
+								setChannel(channel);
 							});
 						}}
 					>
@@ -181,7 +187,7 @@ function App() {
 					<button
 						onClick={() => {
 							const result = window.prompt(
-								"Copy 'localDescription' from 'Offer' side",
+								"Copy 'localDescription' from 'Caller' side",
 							);
 							if (result) {
 								manager.pc.setRemoteDescription(JSON.parse(result));
@@ -211,6 +217,24 @@ function App() {
 			>
 				addIceCandidate
 			</button>
+			<div className="flex flex-col gap-1">
+				<h4>DataChannel</h4>
+				<form
+					action={(formData) => {
+						if (!channel) return;
+						channel.send(String(formData.get("message")));
+					}}
+				>
+					<input name="message" disabled={!channel} />
+					<button className="border-l-0" disabled={!channel}>
+						send
+					</button>
+				</form>
+				<div>Received messages:</div>
+				<pre className="text-xs break-all whitespace-pre-wrap">
+					{JSON.stringify(channelMessages, null, 2)}
+				</pre>
+			</div>
 			<div>
 				<h4>RTCPeerConnection</h4>
 				<pre className="text-xs break-all whitespace-pre-wrap">
@@ -218,13 +242,11 @@ function App() {
 				</pre>
 			</div>
 			<div>
-				{/* TODO */}
 				<h4>RTCIceCandidate</h4>
 				<pre className="text-xs break-all whitespace-pre-wrap">
-					{JSON.stringify([], null, 2)}
+					{JSON.stringify(state.candidates, null, 2)}
 				</pre>
 			</div>
-			{/* TODO: channel message */}
 		</div>
 	);
 }
