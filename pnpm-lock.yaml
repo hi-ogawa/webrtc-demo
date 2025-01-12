@@ -11,9 +11,6 @@ importers:
       '@biomejs/biome':
         specifier: ^1.9.4
         version: 1.9.4
-      '@hiogawa/utils':
-        specifier: ^1.7.0
-        version: 1.7.0
       '@types/node':
         specifier: ^22.10.2
         version: 22.10.5
@@ -479,9 +476,6 @@ packages:
     engines: {node: '>=18'}
     cpu: [x64]
     os: [win32]
-
-  '@hiogawa/utils@1.7.0':
-    resolution: {integrity: sha512-ghiEFWBR1NENoHn+lSuW7liicTIzVPN+8Srm5UedCTw43gus0mlse6Wp2lz6GmbOXJ/CalMPp/0Tz2X8tajkAg==}
 
   '@iconify/types@2.0.0':
     resolution: {integrity: sha512-+wluvCrRhXrhyOmRDJ3q8mux9JkKy5SJ/v8ol2tu4FVjyYvtEzkc/3pK15ET6RKg4b4w4BmTk1+gsCUhf21Ykg==}
@@ -1460,8 +1454,6 @@ snapshots:
 
   '@esbuild/win32-x64@0.24.2':
     optional: true
-
-  '@hiogawa/utils@1.7.0': {}
 
   '@iconify/types@2.0.0': {}
 

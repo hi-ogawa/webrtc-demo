@@ -11,7 +11,6 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^1.9.4",
-		"@hiogawa/utils": "^1.7.0",
 		"@types/node": "^22.10.2",
 		"@types/react": "^19.0.2",
 		"@types/react-dom": "^19.0.2",
