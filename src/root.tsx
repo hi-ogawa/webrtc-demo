@@ -157,7 +157,7 @@ function App() {
 			</div>
 			<div className="text-sm text-slate-800">
 				Open two tabs, one for the "Caller" and one for the "Callee". Follow the
-				steps 1-6 below to setup WebRTC and test DataChannel or Video example.
+				steps 1-6 below to setup WebRTC and test DataChannel or Track example.
 			</div>
 			<label>
 				<span>Example: </span>
@@ -301,7 +301,7 @@ function App() {
 			)}
 			{example === "track" && (
 				<div className="flex flex-col gap-1 w-full">
-					<h4>Video</h4>
+					<h4>Track</h4>
 					<div className="w-full max-w-sm mx-auto">
 						<div className="relative w-full aspect-square overflow-hidden bg-black/95">
 							<video
