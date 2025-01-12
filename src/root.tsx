@@ -144,7 +144,7 @@ function App() {
 
 	return (
 		<div className="flex flex-col gap-4 w-full max-w-lg mx-auto items-start p-2">
-			<h1 className="text-xl">WebRTC Tester</h1>
+			<h1 className="text-xl">WebRTC Demo</h1>
 			<div className="text-sm text-slate-800">
 				Open two tabs, one for the "Caller" and one for the "Callee". Follow the
 				steps 1-6 below to establish a WebRTC connection and test the
