@@ -7,10 +7,14 @@
 		"build": "vite build",
 		"preview": "vite preview",
 		"lint": "biome check --write .",
-		"lint-check": "biome check ."
+		"lint-check": "biome check .",
+		"vc-build": "pnpm build && bash misc/vercel/build.sh",
+		"vc-release": "vercel deploy --prebuilt .",
+		"vc-release-production": "vercel deploy --prebuilt . --prod"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^1.9.4",
+		"@tsconfig/strictest": "^2.0.5",
 		"@types/node": "^22.10.2",
 		"@types/react": "^19.0.2",
 		"@types/react-dom": "^19.0.2",
