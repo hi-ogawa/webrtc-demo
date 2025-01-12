@@ -3,8 +3,34 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>lan-share</title>
-    <script type="module" src="/src/entry-client.tsx"></script>
+    <title>WebRTC Demo</title>
+    <script type="module" src="/src/index.tsx"></script>
+    <style>
+      * {
+        margin: 0;
+        border: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      button {
+        padding: 0.2rem 0.5rem;
+        cursor: pointer;
+        border: 1px solid #0003;
+        transition: 0.3s ease;
+      }
+      button:hover {
+        filter: brightness(0.94);
+      }
+      button:active {
+        filter: brightness(0.88);
+      }
+
+      input {
+        padding: 0.2rem;
+        border: 1px solid #0003;
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>

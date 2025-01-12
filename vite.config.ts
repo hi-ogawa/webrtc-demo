@@ -8,33 +8,9 @@ export default defineConfig({
 	environments: {
 		client: {
 			build: {
-				outDir: "dist/client",
-			},
-		},
-		ssr: {
-			build: {
-				outDir: "dist/server",
-				rollupOptions: {
-					input: "./src/entry-server",
-				},
+				outDir: "dist",
 			},
 		},
 	},
-	plugins: [
-		unocss({ presets: [presetUno()] }),
-		react(),
-		{
-			name: "ssr-middlware",
-			configureServer(server) {
-				server.middlewares.use(async (req, res, next) => {
-					try {
-						const mod = await server.ssrLoadModule("/src/entry-server");
-						await mod.default(req, res, next);
-					} catch (e) {
-						next(e);
-					}
-				});
-			},
-		},
-	],
+	plugins: [unocss({ presets: [presetUno()] }), react()],
 });
