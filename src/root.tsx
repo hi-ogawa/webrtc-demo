@@ -72,12 +72,12 @@ class WebrtcManager {
 	updateState() {
 		this.state = {
 			connection: {
-				localDescription: this.pc.localDescription,
-				remoteDescription: this.pc.remoteDescription,
 				connectionState: this.pc.connectionState,
 				signalingState: this.pc.signalingState,
 				iceConnectionState: this.pc.iceConnectionState,
 				iceGatheringState: this.pc.iceGatheringState,
+				localDescription: this.pc.localDescription,
+				remoteDescription: this.pc.remoteDescription,
 			},
 			candidates: this.candidates,
 		};
@@ -107,8 +107,7 @@ function useDataChannel() {
 	const [state, setState] = React.useState<RTCDataChannelState>();
 	const [messages, setMessages] = React.useState<unknown[]>([]);
 
-	React.useEffect(() => {
-		if (!channel) return;
+	function setChannelWrapper(channel: RTCDataChannel) {
 		for (const eventName of [
 			"open",
 			"close",
@@ -124,9 +123,15 @@ function useDataChannel() {
 			setMessages((v) => [...v, e.data]);
 			setState(channel.readyState);
 		});
-	}, [channel]);
 
-	return [channel, setChannel, messages, state] as const;
+		setChannel(channel);
+	}
+
+	return [
+		channel,
+		setChannelWrapper,
+		{ messages, ready: state === "open" },
+	] as const;
 }
 
 function App() {
@@ -135,7 +140,7 @@ function App() {
 		manager.getSnapshot,
 	);
 
-	const [channel, setChannel, channelMessages] = useDataChannel();
+	const [channel, setChannel, channelState] = useDataChannel();
 
 	return (
 		<div className="flex flex-col gap-4 w-full max-w-lg mx-auto items-start p-2">
@@ -224,18 +229,34 @@ function App() {
 						channel.send(String(formData.get("message")));
 					}}
 				>
-					<input name="message" disabled={!channel} />
-					<button className="border-l-0" disabled={!channel}>
+					<input
+						name="message"
+						placeholder="message..."
+						disabled={!channelState.ready}
+					/>
+					<button className="border-l-0" disabled={!channelState.ready}>
 						send
 					</button>
 				</form>
 				<div>Received messages:</div>
 				<pre className="text-xs break-all whitespace-pre-wrap">
-					{JSON.stringify(channelMessages, null, 2)}
+					{JSON.stringify(channelState.messages, null, 2)}
 				</pre>
 			</div>
 			<div>
-				<h4>RTCPeerConnection</h4>
+				<div className="flex gap-2">
+					<h4>RTCPeerConnection</h4>
+					<button
+						className="p-0 px-1 text-xs"
+						onClick={() => {
+							navigator.clipboard.writeText(
+								JSON.stringify(state.connection.localDescription),
+							);
+						}}
+					>
+						copy localDescription
+					</button>
+				</div>
 				<pre className="text-xs break-all whitespace-pre-wrap">
 					{JSON.stringify(state.connection, null, 2)}
 				</pre>
